@@ -94,6 +94,26 @@ def get_kelly(
 
     return kelly
 
+def get_rolling_kelly(
+    returns: Union[pd.DataFrame, pd.Series],
+    window: int = 400,
+    r: float = 0.02,
+    correlation=False,
+    days: int = 250,
+) -> pd.DataFrame:
+    r_adjusted = (1 + r) ** (1 / days) - 1
+    mean = returns.rolling(window).mean().dropna()
+    return_exces = mean - r_adjusted
+
+    if correlation:
+        roll_cov = returns.expanding(window).cov().dropna()
+        kelly = get_kelly_wrap(roll_cov, return_exces)
+    else:
+        var = returns.expanding(window).var().dropna()
+        kelly = return_exces / var
+
+    return kelly
+
 
 def filter_leverage(serie: pd.Series, leverage: int) -> pd.Series:
     """filters leverage
