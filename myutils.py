@@ -19,6 +19,19 @@ def calculate_trix(close_prices, n):
     trix = (ema3 - ema3.shift(1)) / ema3.shift(1) * 100
     return trix
 
+def set_signal(df):
+    df['trix'] = calculate_trix(df['Price'], n=5)
+    df['buy_signal'] = False
+    df['sell_signal'] = False
+    df['trix'] = df['trix'].fillna(0)
+
+    for i in range(1, len(df)):
+        if df.iloc[i]['trix'] < 0 and df.iloc[i-1]['trix'] > 0:
+            df.at[df.index[i], 'buy_signal'] = True
+        elif df.iloc[i]['trix'] > 0 and df.iloc[i-1]['trix'] < 0:
+            df.at[df.index[i], 'sell_signal'] = True
+    return df
+
 def get_historical_var(df, window_size, percentile):
     df['VaR'] = df['Change'].rolling(window=window_size).quantile(percentile, interpolation='lower')
     return df
@@ -38,6 +51,18 @@ def get_rolling_kelly(df, window: int = 400):
 
     return kelly
 
+def calculate_capped_kelly(kelly_criterion):
+    if kelly_criterion > 5:
+        return 5
+    else:
+        return 0 if kelly_criterion < 0 else kelly_criterion
+    
+def update_var_kelly(row):
+    if row['VaR'] > row['Change']:
+        return 0
+    else:
+        return row['kelly_ratio']
+
 def get_cumulative_trix_returns(df):
     portfolio = np.zeros(len(df))
     equity = np.zeros(len(df))
@@ -53,8 +78,8 @@ def get_cumulative_trix_returns(df):
             portfolio[i] = equity[i-1] * (1 + row['Change']) + cash[i-1] * (1 + row['rf'])
             if row['buy_signal']:
                 if portfolio[i] < 0:
-                    equity[i] = equity[i-1] * (1 + row['Change']) + row['kelly_ratio']
-                    cash[i] = cash[i-1] * (1 + row['rf']) - row['kelly_ratio']
+                    equity[i] = equity[i-1] * (1 + row['Change']) 
+                    cash[i] = cash[i-1] * (1 + row['rf']) 
                 else:
                     equity[i] = portfolio[i] * row['kelly_ratio'] 
                     cash[i] = portfolio[i] * (1 - row['kelly_ratio'])                   
