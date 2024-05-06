@@ -7,4 +7,4 @@ Value at Risk 개념을 활용한 Kelly Criterion 투자전략 재해석
 
 ## 각 파일 설명
 1. utils: 전략 구현에 필요한 함수
-2. trix.ipynb: 
+2. kelly_var: 전략 구현 과정

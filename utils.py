@@ -51,9 +51,9 @@ def get_rolling_kelly(df, window: int = 400):
 
     return kelly
 
-def calculate_capped_kelly(kelly_criterion):
-    if kelly_criterion > 5:
-        return 5
+def calculate_capped_kelly(kelly_criterion, leverage):
+    if kelly_criterion > leverage:
+        return leverage
     else:
         return 0 if kelly_criterion < 0 else kelly_criterion
     
