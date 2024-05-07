@@ -20,7 +20,6 @@ def calculate_trix(close_prices, n):
     return trix
 
 def set_signal(df):
-    df['trix'] = calculate_trix(df['Price'], n=5)
     df['buy_signal'] = False
     df['sell_signal'] = False
     df['trix'] = df['trix'].fillna(0)
