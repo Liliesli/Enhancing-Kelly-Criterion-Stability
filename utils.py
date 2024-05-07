@@ -6,8 +6,11 @@ def process_data(df):
     df.set_index('Date', inplace=True)
     df['Change'] = df['Change %'].str.rstrip('%').astype(float) / 100
     numeric_cols = ['Price', 'Open', 'High', 'Low']
-    for col in numeric_cols:
-        df[col] = df[col].str.replace(',', '').astype(float)
+    try:
+        for col in numeric_cols:
+            df[col] = df[col].str.replace(',', '').astype(float)
+    except:
+        pass
     df.drop('Vol.', axis=1, inplace=True)
     return df
 
@@ -19,21 +22,21 @@ def calculate_trix(close_prices, n):
     trix = (ema3 - ema3.shift(1)) / ema3.shift(1) * 100
     return trix
 
-def set_signal(df):
+def set_signal(df, asset_nm):
     df['trix'] = calculate_trix(df['Price'], n=5)
-    df['buy_signal'] = False
-    df['sell_signal'] = False
+    df[f'buy_{asset_nm}'] = False
+    df[f'sell_{asset_nm}'] = False
     df['trix'] = df['trix'].fillna(0)
 
     for i in range(1, len(df)):
         if df.iloc[i]['trix'] < 0 and df.iloc[i-1]['trix'] > 0:
-            df.at[df.index[i], 'buy_signal'] = True
+            df.at[df.index[i], f'buy_{asset_nm}'] = True
         elif df.iloc[i]['trix'] > 0 and df.iloc[i-1]['trix'] < 0:
-            df.at[df.index[i], 'sell_signal'] = True
+            df.at[df.index[i], f'sell_{asset_nm}'] = True
     return df
 
-def get_historical_var(df, window_size, percentile):
-    df['VaR'] = df['Change'].rolling(window=window_size).quantile(percentile, interpolation='lower')
+def get_historical_var(df, window_size, percentile, asset_nm):
+    df[f'VaR_{asset_nm}'] = df['Change'].rolling(window=window_size).quantile(percentile, interpolation='lower')
     return df
 
 def calculate_daily_rf(df, days):
