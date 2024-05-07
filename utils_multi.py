@@ -81,7 +81,7 @@ def get_cumulative_trix_returns(df):
             equity[0] = row['capped_sp500']
             equity2[0] = row['capped_kospi']
         else:
-            portfolio[i] = equity[i-1] * (1 + row['Chang2_sp500']) + equity2[i-1] * (1+row['Change_kospi']) + cash[i-1] * (1 + row['rf'])
+            portfolio[i] = equity[i-1] * (1 + row['Change_sp500']) + equity2[i-1] * (1+row['Change_kospi']) + cash[i-1] * (1 + row['rf'])
             if row['buy_kospi']:
                 if portfolio[i] < 0:
                     equity[i] = equity[i-1] * (1 + row['Change_sp500']) 
@@ -112,7 +112,7 @@ def get_cumulative_trix_returns(df):
                     cash[i] = portfolio[i] + equity2[i-1]
             else:
                 if row['buy_sp500']:
-                    equity[i] = portfolio[i] * row['Change_sp500'] 
+                    equity[i] = portfolio[i] * row['capped_sp500'] 
                     equity2[i] = equity2[i-1] * (1 + row['Change_kospi'])
                     cash[i] = portfolio[i] * (1 - row['capped_sp500'] - latest_kospi)   
                     latest_sp500 = row['capped_sp500']  
