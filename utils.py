@@ -62,6 +62,12 @@ def update_var_kelly(row):
     else:
         return row['kelly_ratio']
 
+def classify_rf(df, cash, idx):
+    if cash[idx-1] < 0:
+        return df.iloc[idx]['rf_loan']
+    else:
+        return df.iloc[idx]['rf']
+
 def get_cumulative_trix_returns(df):
     portfolio = np.zeros(len(df))
     equity = np.zeros(len(df))
@@ -74,11 +80,11 @@ def get_cumulative_trix_returns(df):
             cash[0] = 1-row['kelly_ratio']
             equity[0] = row['kelly_ratio']
         else:
-            portfolio[i] = equity[i-1] * (1 + row['Change']) + cash[i-1] * (1 + row['rf'])
+            portfolio[i] = equity[i-1] * (1 + row['Change']) + cash[i-1] * (1 + classify_rf(df, cash, i))
             if row['buy_signal']:
                 if portfolio[i] < 0:
                     equity[i] = equity[i-1] * (1 + row['Change']) 
-                    cash[i] = cash[i-1] * (1 + row['rf']) 
+                    cash[i] = cash[i-1] * (1 + classify_rf(df, cash, i)) 
                 else:
                     equity[i] = portfolio[i] * row['kelly_ratio'] 
                     cash[i] = portfolio[i] * (1 - row['kelly_ratio'])                   
@@ -87,7 +93,7 @@ def get_cumulative_trix_returns(df):
                 cash[i] = portfolio[i]
             else:
                 equity[i] = equity[i-1] * (1 + row['Change'])
-                cash[i] = cash[i-1] * (1 + row['rf'])
+                cash[i] = cash[i-1] * (1 + classify_rf(df, cash, i))
     df.loc[:, 'portfolio'] = portfolio
     df.loc[:, 'equity'] = equity
     df.loc[:, 'cash'] = cash
