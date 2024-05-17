@@ -1,4 +1,5 @@
-# Enhancing Kelly Criterion Stability: A VaR-Centric Approach
+# Enhancing Kelly Criterion Stability: 
+  # A VaR-Centric Approach
 Value at Risk 개념을 활용한 Kelly Criterion 투자전략 재해석
 
 ## 환경 설정
