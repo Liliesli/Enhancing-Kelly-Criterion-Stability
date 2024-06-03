@@ -1,15 +1,4 @@
-import pandas as pd
 import numpy as np
-
-def process_data(df):
-    df = df[::-1].reset_index(drop=True)
-    df.set_index('Date', inplace=True)
-    df['Change'] = df['Change %'].str.rstrip('%').astype(float) / 100
-    numeric_cols = ['Price', 'Open', 'High', 'Low']
-    for col in numeric_cols:
-        df[col] = df[col].str.replace(',', '').astype(float)
-    df.drop('Vol.', axis=1, inplace=True)
-    return df
 
 def calculate_trix(close_prices, n):
     ema1 = close_prices.ewm(span=n, min_periods=n).mean()
@@ -35,10 +24,11 @@ def get_historical_var(df, window_size, percentile):
     df['VaR'] = df['Change'].rolling(window=window_size).quantile(percentile, interpolation='lower')
     return df
 
-def calculate_daily_rf(df, days):
-    df['rf'] = (1 + df['rf']/100) ** (1 / days) - 1
-    df = df.set_index('Date')
-    return df
+def calculate_daily_rate(value, days):
+    if value:
+        return (1 + value/100) ** (1 / days) - 1
+    else:
+        return
 
 def get_rolling_kelly(df, window: int = 400):
     mean = df['Change'].rolling(window).mean().dropna()
@@ -64,9 +54,9 @@ def update_var_kelly(row):
 
 def classify_rf(df, cash, idx):
     if cash[idx-1] < 0:
-        return df.iloc[idx]['rf_loan']
+        return df.iloc[idx]['loan_rate']
     else:
-        return df.iloc[idx]['rf']
+        return df.iloc[idx]['deposit_rate']
 
 def get_cumulative_trix_returns(df):
     portfolio = np.zeros(len(df))
