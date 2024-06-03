@@ -76,7 +76,6 @@ class RateProcessor:
         return joined
     
     def fill_na(self, joined):
-        print(joined)
         joined['loan_rate'] = joined['loan_rate'].ffill()
         joined['deposit_rate'] = joined['deposit_rate'].ffill()
         joined['rf'] = joined['rf'].ffill()
