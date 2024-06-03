@@ -89,6 +89,7 @@ class RateProcessor:
 
         merged_data = self.merge_data(loan_rf, self.asset_dataset, deposit_rf, rf)
         merged_data = self.fill_na(merged_data)
+        merged_data['Date'] = merged_data['Date'].dt.strftime('%Y-%m-%d')
         merged_data.to_csv(f'data/{file_nm}.csv', index=False)
         
         return merged_data

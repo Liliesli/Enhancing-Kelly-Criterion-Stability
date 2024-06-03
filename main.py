@@ -3,10 +3,24 @@ from utils import *
 from visualization import Visualization
 
 def generate_date_range(date, years):
-    start_date = pd.to_datetime(date) - pd.DateOffset(years=years)
-    end_date = pd.to_datetime(date) + pd.DateOffset(years=years)
-    date_range = f"{start_date.strftime('%Y-%m-%d')}~{end_date.strftime('%Y-%m-%d')}"
-    return date_range
+    processed_date = []
+    for year in years:
+        # 년도와 월로 나누기
+        whole_years = int(years)
+        additional_months = int((years - whole_years) * 12)
+
+        start_date = pd.to_datetime(date) - pd.DateOffset(years=whole_years, months=additional_months)
+        end_date = pd.to_datetime(date) + pd.DateOffset(years=whole_years, months=additional_months)
+        
+        if start_date < pd.to_datetime('2007-12-31'):
+            start_date = pd.to_datetime('2007-12-31')
+
+        if end_date > pd.to_datetime('2024-05-31'):
+            end_date = pd.to_datetime('2024-05-31')
+
+        processed_date.append(f"{start_date.strftime('%Y-%m-%d')}~{end_date.strftime('%Y-%m-%d')}")
+    return processed_date.join(', ')
+
 
 def generate_result(confidence_interval, date_range):
     dataset = pd.read_csv('data/total_dataset.csv')
@@ -56,15 +70,19 @@ def generate_result(confidence_interval, date_range):
 
 if __name__ == '__main__':
     for confidence in [0.01, 0.03, 0.05, 0.1]:
-        for date_range in [generate_date_range('2020-03-09', 2), 
+        for date_range in [generate_date_range('2020-03-09', 3),
+                           generate_date_range('2020-03-09', 2), 
                            generate_date_range('2020-03-09', 1.5),
 
+                           generate_date_range('2015-08-24', 3),
                            generate_date_range('2015-08-24', 2),
                            generate_date_range('2015-08-24', 1.5),
 
+                           generate_date_range('2018-10-11', 3),
                            generate_date_range('2018-10-11', 2),
                            generate_date_range('2018-10-11', 1.5),
 
+                           generate_date_range('2022-05-09', 3),
                            generate_date_range('2022-05-09', 2),
                            generate_date_range('2022-05-09', 1.5),
 
