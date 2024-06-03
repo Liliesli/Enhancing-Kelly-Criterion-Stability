@@ -3,23 +3,21 @@ from utils import *
 from visualization import Visualization
 
 def generate_date_range(date, years):
-    processed_date = []
-    for year in years:
-        # 년도와 월로 나누기
-        whole_years = int(years)
-        additional_months = int((years - whole_years) * 12)
+    # 년도와 월로 나누기
+    whole_years = int(years)
+    additional_months = int((years - whole_years) * 12)
 
-        start_date = pd.to_datetime(date) - pd.DateOffset(years=whole_years, months=additional_months)
-        end_date = pd.to_datetime(date) + pd.DateOffset(years=whole_years, months=additional_months)
-        
-        if start_date < pd.to_datetime('2007-12-31'):
-            start_date = pd.to_datetime('2007-12-31')
+    start_date = pd.to_datetime(date) - pd.DateOffset(years=whole_years, months=additional_months)
+    end_date = pd.to_datetime(date) + pd.DateOffset(years=whole_years, months=additional_months)
+    
+    if start_date < pd.to_datetime('2007-12-31'):
+        start_date = pd.to_datetime('2007-12-31')
 
-        if end_date > pd.to_datetime('2024-05-31'):
-            end_date = pd.to_datetime('2024-05-31')
+    if end_date > pd.to_datetime('2024-05-31'):
+        end_date = pd.to_datetime('2024-05-31')
 
-        processed_date.append(f"{start_date.strftime('%Y-%m-%d')}~{end_date.strftime('%Y-%m-%d')}")
-    return processed_date.join(', ')
+    return f"{start_date.strftime('%Y-%m-%d')}~{end_date.strftime('%Y-%m-%d')}"
+
 
 
 def generate_result(confidence_interval, date_range):
