@@ -3,3 +3,8 @@ trix_result
 data/drops_3days.csv
 data/drops.csv
 analysis.py
+
+.DS_Store
+__pycache__/
+data/.DS_Store
+data/__pycache__/
